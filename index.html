@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BitVis</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-rc.2/css/materialize.min.css" media="screen,projection">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/main.css">
+</head>
+
+<body>
+
+<nav>
+  <div class="nav-wrapper">
+    <a href="#" data-target="slide-menu" class="sidenav-trigger show-on-large"><i class="material-icons">menu</i></a>
+    <a href="/" class="brand-logo">BitVis</a>
+
+    <ul class="right hide-on-med-and-down">
+      <li><a href="#"><i class="material-icons left">contact</i>Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<ul class="sidenav" id="slide-menu">
+  <li><a href="#"><i class="material-icons left">contact</i>Contact</a></li>
+</ul>
+
+<div class="section">
+
+  <div id="bit-sets"></div>
+
+  <div class="row">
+    <div class="col s12">
+      <button id="add-row-btn">Add Row</button>
+    </div>
+  </div>
+</div>
+
+<div class="protos" hidden>
+
+  <div id="bit-set-div-proto" class="bit-sets-div">
+
+    <div class="bit-set-div">
+      <div class="row">
+
+        <div class="col s2 m2 bit-set-label-div">
+          Row <span class="bit-set-name-span"></span>
+        </div>
+
+        <div class="col s10 m8 bits-div">
+          <button class="btn bit-btn">0</button>
+          <button class="btn bit-btn">0</button>
+          <button class="btn bit-btn">0</button>
+          <button class="btn bit-btn">0</button>
+          <button class="btn bit-btn">0</button>
+          <button class="btn bit-btn">0</button>
+          <button class="btn bit-btn">0</button>
+          <button class="btn bit-btn">0</button>
+        </div>
+
+        <div class="m2 bit-controls-div hide-on-small-only" hidden>
+          <button class="btn-small all-zero-btn">All 0</button>
+          <button class="btn-small all-one-btn">All 1</button>
+        </div>
+
+      </div>
+
+      <div class="row ops-div" hidden>
+        <div class="col s2">
+          <label>
+            <input type="radio" class="bit-ops invert-bit-op">
+            <span>Invert</span>
+          </label>
+        </div>
+        <div class="col s2">
+          <label>
+            <input type="radio" class="bit-ops shiftright-bit-op">
+            <span>&gt&gt</span>
+          </label>
+        </div>
+        <div class="col s2">
+          <label>
+            <input type="radio" class="bit-ops shiftleft-bit-op">
+            <span>&lt&lt</span>
+          </label>
+        </div>
+        <div class="col s2">
+          <label>
+            <input type="radio" class="bit-ops xor-bit-op">
+            <span>XOR</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col push-s2 push-m2 s10 m8 other-bits-div">
+          <button class="btn other-bit-btn">0</button>
+          <button class="btn other-bit-btn">0</button>
+          <button class="btn other-bit-btn">0</button>
+          <button class="btn other-bit-btn">0</button>
+          <button class="btn other-bit-btn">0</button>
+          <button class="btn other-bit-btn">0</button>
+          <button class="btn other-bit-btn">0</button>
+          <button class="btn other-bit-btn">0</button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+</body>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
+<script type="text/javascript" src="/static/js/bitvis.js"></script>
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', function() {
+    M.Sidenav.init(document.querySelectorAll('.sidenav'));
+  });
+</script>
+
+</html>
