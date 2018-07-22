@@ -1,6 +1,6 @@
 'use strict';
 
-(function(){
+(function () {
 
   const BIT_SETS_ELEM = document.getElementById('bit-sets');
   const BIT_SET_PROTO = document.getElementById('bit-set-div-proto');
@@ -8,91 +8,146 @@
   let bitSets = [];
 
   class BitSet {
-    constructor(name, size, elem, next) {
+    constructor(name, size, elem) {
       this.name = name;
       this.bits = [];
       this.otherBits = [];
+      this.resultBits = [];
 
       for (let i = 0; i < size; i += 1) {
         this.bits.push(0);
         this.otherBits.push(0);
+        this.resultBits.push(0);
       }
 
-      this.otherLink = name;
+      this.link = name * 10;
+      this.otherLink = name * 10;
 
       this.elem = elem;
+
       this.buttons = this.elem.getElementsByClassName('bit-btn');
       this.otherButtons = this.elem.getElementsByClassName('other-bit-btn');
+      this.resultButtons = this.elem.getElementsByClassName('result-bit-btn');
+
+      this.linkButton = this.elem.getElementsByClassName('link-button')[0];
       this.otherLinkButton = this.elem.getElementsByClassName('other-link-button')[0];
 
-      this.next = next;
       this.op = null;
     }
 
     init() {
       let self = this;
+
       for (let i = 0; i < this.bits.length; i += 1) {
-        this.buttons[i].addEventListener('click', function(){ self.flipBit(i); });
-        this.otherButtons[i].addEventListener('click', function(){ self.flipOtherBit(i); });
+        this.buttons[i].addEventListener('click', function () { self.flipBit(i); });
+        this.otherButtons[i].addEventListener('click', function () { self.flipOtherBit(i); });
       }
 
       let ops = this.elem.getElementsByClassName('bit-ops');
       for (let i = 0; i < ops.length; i += 1) {
         ops[i].name = 'bit-ops-' + this.name;
         if (ops[i].classList.contains('invert-bit-op')) {
-          ops[i].addEventListener('change', function(){
-            if (ops[i].value) { self.setOp(self.invert); }
+          ops[i].addEventListener('change', function () {
+            if (ops[i].value) {
+              self.setOp(self.invert);
+            }
           });
         } else if (ops[i].classList.contains('shiftright-bit-op')) {
-          ops[i].addEventListener('change', function(){
-            if (ops[i].value) { self.setOp(self.shiftRight); }
+          ops[i].addEventListener('change', function () {
+            if (ops[i].value) {
+              self.setOp(self.shiftRight);
+            }
           });
         } else if (ops[i].classList.contains('shiftleft-bit-op')) {
-          ops[i].addEventListener('change', function(){
-            if (ops[i].value) { self.setOp(self.shiftLeft); }
+          ops[i].addEventListener('change', function () {
+            if (ops[i].value) {
+              self.setOp(self.shiftLeft);
+            }
           });
         } else if (ops[i].classList.contains('xor-bit-op')) {
-          ops[i].addEventListener('change', function(){
-            if (ops[i].value) { self.setOp(self.xor); }
+          ops[i].addEventListener('change', function () {
+            if (ops[i].value) {
+              self.setOp(self.xor);
+            }
           });
         }
       }
 
       if (this.name > 0) {
-        this.otherLinkButton.addEventListener('click', function(){ self.cycleLinks(); });
+        this.linkButton.addEventListener('click', function () { self.cycleLinks(0); });
+        this.otherLinkButton.addEventListener('click', function () { self.cycleLinks(1); });
       } else {
+        this.linkButton.disabled = true;
         this.otherLinkButton.disabled = true;
       }
 
-      let allToZero = this.elem.getElementsByClassName('all-zero-btn')[0];
-      allToZero.addEventListener('click', allToHandler(self, 0));
-      let allToOne = this.elem.getElementsByClassName('all-one-btn')[0];
-      allToOne.addEventListener('click', allToHandler(self, 1));
-
       this.refresh();
+    }
+
+    refresh() {
+      this.elem.getElementsByClassName('bit-set-name-span')[0].innerText = this.name;
+
+      for (let i = 0; i < this.buttons.length; i += 1) {
+        this.buttons[i].innerText = this.bits[i];
+        this.otherButtons[i].innerText = this.otherBits[i];
+        this.buttons[i].disabled = this.link !== this.name * 10;
+        this.otherButtons[i].disabled = this.otherLink !== this.name * 10;
+      }
+
+      this.linkButton.innerText = this.link === this.name * 10 ? 'INPUT' : linkName(this.link);
+      this.otherLinkButton.innerText = this.otherLink === this.name * 10
+          ? 'INPUT' : linkName(this.otherLink);
+
+      this.elem.getElementsByClassName('other-bits-div')[0].hidden = !(this.op === this.xor);
     }
 
     setBit(index, value) {
       this.bits[index] = value;
       this.buttons[index].innerText = value;
-      this.propagateChange(index);
+      this.updateResultBits(index);
     }
 
     setOtherBit(index, value) {
       this.otherBits[index] = value;
       this.otherButtons[index].innerText = value;
-      this.propagateChange(index);
+      this.updateResultBits(index);
     }
 
-    setNext(next) {
-      this.next = next;
-      this.refresh();
+    setResultBit(index, value) {
+      this.resultBits[index] = value;
+      this.resultButtons[index].innerText = value;
     }
 
     setOp(func) {
       this.op = func;
       this.refresh();
-      this.propagateChange(-1);
+      this.updateResultBits(-1);
+    }
+
+    updateBits() {
+      let bs = getSet(this.link);
+      for (let i = 0; i < this.bits.length; i += 1) {
+        this.setBit(i, bs[i]);
+      }
+    }
+
+    updateOtherBits() {
+      let bs = getSet(this.otherLink);
+      for (let i = 0; i < this.otherBits.length; i += 1) {
+        this.setOtherBit(i, bs[i]);
+      }
+    }
+
+    updateResultBits(index) {
+      if (!!this.op) {
+        if (index >= 0) {
+          this.op(index);
+        } else {
+          for (let i = 0; i < this.resultBits.length; i += 1) {
+            this.op(i);
+          }
+        }
+      }
     }
 
     flipBit(index) {
@@ -103,85 +158,67 @@
       this.setOtherBit(index, 1 - this.otherBits[index]);
     }
 
-    propagateChange(index) {
-      postUpdate(this.name);
-      if (!!this.op) {
-        if (-1 < index && index < this.bits.length) {
-          this.op(index);
-        } else {
-          for (let i = 0; i < this.bits.length; i += 1) {
-            this.op(i);
-          }
-        }
-      }
-    }
-
-    refresh() {
-      if (name % 2 === 1) this.elem.classList.add('z-depth-1');
-
-      this.elem.getElementsByClassName('bit-set-name-span')[0].innerText = this.name;
-
-      for (let i = 0; i < this.buttons.length; i += 1) {
-        this.buttons[i].innerText = this.bits[i];
-        this.otherButtons[i].innerText = this.otherBits[i];
-        this.buttons[i].disabled = this.name > 0;
-        this.otherButtons[i].disabled = this.otherLink !== this.name;
-      }
-
-      this.otherLinkButton.innerText = this.otherLink === this.name ? 'INPUT' : this.otherLink;
-
-      this.elem.getElementsByClassName('other-bits-div')[0].hidden = !(this.op === this.xor);
-
-      this.elem.getElementsByClassName('ops-div')[0].hidden = !this.next;
-      this.elem.getElementsByClassName('bit-controls-div')[0].hidden = this.name > 0;
-    }
-
     invert(index) {
-      if (!!this.next) {
-        this.next.setBit(index, 1 - this.bits[index]);
-        this.next.propagateChange(index);
-      }
+      this.setResultBit(index, 1 - this.bits[index]);
     }
 
     shiftRight(index) {
-      if (!!this.next) {
-        if (index === this.bits.length - 1) {
-          this.next.setBit(0, 0)
-        } else {
-          this.next.setBit(index+1, this.bits[index]);
-        }
-        this.next.propagateChange(index+1);
+      if (index === this.bits.length - 1) {
+        this.setResultBit(0, 0)
+      } else {
+        this.setResultBit(index + 1, this.bits[index]);
       }
     }
 
     shiftLeft(index) {
-      if (!!this.next) {
-        if (index === 0) {
-          this.next.setBit(this.bits.length - 1, 0)
-        } else {
-          this.next.setBit(index-1, this.bits[index]);
-        }
-        this.next.propagateChange(index-1);
+      if (index === 0) {
+        this.setResultBit(this.bits.length - 1, 0)
+      } else {
+        this.setResultBit(index - 1, this.bits[index]);
       }
     }
 
     xor(index) {
-      if (!!this.next) {
-        this.next.setBit(index, this.bits[index] ^ this.otherBits[index]);
-        this.next.propagateChange(index);
-      }
+      this.setResultBit(index, this.bits[index] ^ this.otherBits[index]);
     }
 
-    cycleLinks() {
-      this.otherLink = (this.otherLink + 1) % (this.name + 1);
-      this.updateOtherBits();
+    cycleLinks(set) {
+      function calcNext(i, name) {
+        i = i + (i % 10 === 2 ? 8 : 1);
+        i = i % (name * 10 + 1);
+        return i;
+      }
+
+      switch (set) {
+        case 0:
+          this.link = calcNext(this.link, this.name);
+          this.updateBits(-1);
+          break;
+        case 1:
+          this.otherLink = calcNext(this.otherLink, this.name);
+          this.updateOtherBits(-1);
+          break;
+        case 2:
+          break;
+      }
+
       this.refresh();
     }
+  }
 
-    updateOtherBits() {
-      for (let i = 0; i < this.otherBits.length; i += 1) {
-        this.setOtherBit(i, bitSets[this.otherLink].bits[i]);
-      }
+  function linkName(num) {
+    return Math.floor(num / 10) + '.' + num % 10;
+  }
+
+  function getSet(link) {
+    let major = Math.floor(link / 10);
+    switch (link % 10) {
+      case 0:
+        return bitSets[major].bits;
+      case 1:
+        return bitSets[major].otherBits;
+      case 2:
+        return bitSets[major].resultBits;
     }
   }
 
@@ -193,15 +230,6 @@
     }
   }
 
-  function allToHandler(bitSet, value) {
-    return function() {
-      for (let i = 0; i < bitSet.bits.length; i += 1) {
-        bitSet.setBit(i, value);
-      }
-      bitSet.propagateChange();
-    }
-  }
-
   function spawnBitSet() {
     let name = bitSets.length;
 
@@ -209,13 +237,9 @@
     elem.removeAttribute('id');
     BIT_SETS_ELEM.appendChild(elem);
 
-    let bitSet = new BitSet(name, 8, elem, null);
+    let bitSet = new BitSet(name, 8, elem);
     bitSet.init();
 
-    if (bitSets.length > 0) {
-      bitSets[name - 1].setNext(bitSet);
-      bitSets[name - 1].propagateChange(-1);
-    }
     bitSets.push(bitSet);
 
     bitSet.refresh();
@@ -224,11 +248,10 @@
   }
 
 
-  document.addEventListener('DOMContentLoaded', function(){
+  document.addEventListener('DOMContentLoaded', function () {
     let first = spawnBitSet(null);
-    let second = spawnBitSet(null);
 
-    document.getElementById('add-row-btn').addEventListener('click', function(){
+    document.getElementById('add-row-btn').addEventListener('click', function () {
       spawnBitSet();
     });
   });
