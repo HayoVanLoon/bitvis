@@ -18,11 +18,12 @@
         this.otherBits.push(0);
       }
 
-      this.otherRef = null;
+      this.otherLink = name;
 
       this.elem = elem;
       this.buttons = this.elem.getElementsByClassName('bit-btn');
       this.otherButtons = this.elem.getElementsByClassName('other-bit-btn');
+      this.otherLinkButton = this.elem.getElementsByClassName('other-link-button')[0];
 
       this.next = next;
       this.op = null;
@@ -37,7 +38,7 @@
 
       let ops = this.elem.getElementsByClassName('bit-ops');
       for (let i = 0; i < ops.length; i += 1) {
-        ops[i].name = 'bit-ops-' + name;
+        ops[i].name = 'bit-ops-' + this.name;
         if (ops[i].classList.contains('invert-bit-op')) {
           ops[i].addEventListener('change', function(){
             if (ops[i].value) { self.setOp(self.invert); }
@@ -55,6 +56,12 @@
             if (ops[i].value) { self.setOp(self.xor); }
           });
         }
+      }
+
+      if (this.name > 0) {
+        this.otherLinkButton.addEventListener('click', function(){ self.cycleLinks(); });
+      } else {
+        this.otherLinkButton.disabled = true;
       }
 
       let allToZero = this.elem.getElementsByClassName('all-zero-btn')[0];
@@ -97,6 +104,7 @@
     }
 
     propagateChange(index) {
+      postUpdate(this.name);
       if (!!this.op) {
         if (-1 < index && index < this.bits.length) {
           this.op(index);
@@ -109,16 +117,18 @@
     }
 
     refresh() {
+      if (name % 2 === 1) this.elem.classList.add('z-depth-1');
+
       this.elem.getElementsByClassName('bit-set-name-span')[0].innerText = this.name;
 
       for (let i = 0; i < this.buttons.length; i += 1) {
         this.buttons[i].innerText = this.bits[i];
         this.otherButtons[i].innerText = this.otherBits[i];
-        if (this.name > 0) {
-          this.buttons[i].disabled = true;
-          this.otherButtons[i].disabled = true;
-        }
+        this.buttons[i].disabled = this.name > 0;
+        this.otherButtons[i].disabled = this.otherLink !== this.name;
       }
+
+      this.otherLinkButton.innerText = this.otherLink === this.name ? 'INPUT' : this.otherLink;
 
       this.elem.getElementsByClassName('other-bits-div')[0].hidden = !(this.op === this.xor);
 
@@ -159,6 +169,26 @@
       if (!!this.next) {
         this.next.setBit(index, this.bits[index] ^ this.otherBits[index]);
         this.next.propagateChange(index);
+      }
+    }
+
+    cycleLinks() {
+      this.otherLink = (this.otherLink + 1) % (this.name + 1);
+      this.updateOtherBits();
+      this.refresh();
+    }
+
+    updateOtherBits() {
+      for (let i = 0; i < this.otherBits.length; i += 1) {
+        this.setOtherBit(i, bitSets[this.otherLink].bits[i]);
+      }
+    }
+  }
+
+  function postUpdate(name) {
+    for (let i = name + 1; i < bitSets.length; i += 1) {
+      if (bitSets[i].otherLink === name) {
+        bitSets[i].updateOtherBits();
       }
     }
   }

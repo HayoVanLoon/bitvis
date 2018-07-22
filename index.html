@@ -26,13 +26,12 @@
   <li><a href="#"><i class="material-icons left">contact</i>Contact</a></li>
 </ul>
 
+<div id="bit-sets"></div>
+
 <div class="section">
-
-  <div id="bit-sets"></div>
-
   <div class="row">
     <div class="col s12">
-      <button id="add-row-btn">Add Row</button>
+      <button id="add-row-btn" class="btn">Add Row</button>
     </div>
   </div>
 </div>
@@ -41,14 +40,14 @@
 
   <div id="bit-set-div-proto" class="bit-sets-div">
 
-    <div class="bit-set-div">
-      <div class="row">
+    <div class="bit-set-div section">
 
-        <div class="col s2 m2 bit-set-label-div">
+      <div class="row">
+        <div class="col s2 bit-set-label-div">
           Row <span class="bit-set-name-span"></span>
         </div>
 
-        <div class="col s10 m8 bits-div">
+        <div class="col s8 m6 bits-div">
           <button class="btn bit-btn">0</button>
           <button class="btn bit-btn">0</button>
           <button class="btn bit-btn">0</button>
@@ -57,13 +56,16 @@
           <button class="btn bit-btn">0</button>
           <button class="btn bit-btn">0</button>
           <button class="btn bit-btn">0</button>
+        </div>
+
+        <div class="col s2">
+          <input type="text">
         </div>
 
         <div class="m2 bit-controls-div hide-on-small-only" hidden>
           <button class="btn-small all-zero-btn">All 0</button>
           <button class="btn-small all-one-btn">All 1</button>
         </div>
-
       </div>
 
       <div class="row ops-div" hidden>
@@ -93,8 +95,10 @@
         </div>
       </div>
 
-      <div class="row">
-        <div class="col push-s2 push-m2 s10 m8 other-bits-div">
+      <div class="row other-bits-div">
+        <div class="col s2 other-bits-div">&nbsp;</div>
+
+        <div class="col s6 other-bits-div">
           <button class="btn other-bit-btn">0</button>
           <button class="btn other-bit-btn">0</button>
           <button class="btn other-bit-btn">0</button>
@@ -104,9 +108,18 @@
           <button class="btn other-bit-btn">0</button>
           <button class="btn other-bit-btn">0</button>
         </div>
+        <div class="col s2">
+          <input type="text">
+        </div>
+
+        <div class="col s2">
+          <button class="btn other-link-button"></button>
+        </div>
       </div>
 
     </div>
+
+    <div class="divider"></div>
 
   </div>
 
