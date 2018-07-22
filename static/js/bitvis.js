@@ -104,18 +104,21 @@
     setBit(index, value) {
       this.bits[index] = value;
       this.buttons[index].innerText = value;
+      postUpdate(this.name * 10, index);
       this.updateResultBits(index);
     }
 
     setOtherBit(index, value) {
       this.otherBits[index] = value;
       this.otherButtons[index].innerText = value;
+      postUpdate(this.name * 10 + 1, index);
       this.updateResultBits(index);
     }
 
     setResultBit(index, value) {
       this.resultBits[index] = value;
       this.resultButtons[index].innerText = value;
+      postUpdate(this.name * 10 + 2, index);
     }
 
     setOp(func) {
@@ -124,17 +127,25 @@
       this.updateResultBits(-1);
     }
 
-    updateBits() {
+    updateBits(index) {
       let bs = getSet(this.link);
-      for (let i = 0; i < this.bits.length; i += 1) {
-        this.setBit(i, bs[i]);
+      if (index >= 0) {
+        this.setBit(index, bs[index]);
+      } else {
+        for (let i = 0; i < this.bits.length; i += 1) {
+          this.setBit(i, bs[i]);
+        }
       }
     }
 
-    updateOtherBits() {
+    updateOtherBits(index) {
       let bs = getSet(this.otherLink);
-      for (let i = 0; i < this.otherBits.length; i += 1) {
-        this.setOtherBit(i, bs[i]);
+      if (index >= 0) {
+        this.setOtherBit(index, bs[index]);
+      } else {
+        for (let i = 0; i < this.otherBits.length; i += 1) {
+          this.setOtherBit(i, bs[i]);
+        }
       }
     }
 
@@ -207,7 +218,12 @@
   }
 
   function linkName(num) {
-    return Math.floor(num / 10) + '.' + num % 10;
+    let label = getLabel(num);
+    if (label !== '') {
+      return label;
+    } else {
+      return Math.floor(num / 10) + '.' + num % 10;
+    }
   }
 
   function getSet(link) {
@@ -222,10 +238,27 @@
     }
   }
 
-  function postUpdate(name) {
-    for (let i = name + 1; i < bitSets.length; i += 1) {
-      if (bitSets[i].otherLink === name) {
-        bitSets[i].updateOtherBits();
+  function getLabel(link) {
+    let major = Math.floor(link / 10);
+    switch (link % 10) {
+      case 0:
+        return bitSets[major].elem.getElementsByClassName('bits-label')[0].value;
+      case 1:
+        return bitSets[major].elem.getElementsByClassName('other-bits-label')[0].value;
+      case 2:
+        return bitSets[major].elem.getElementsByClassName('result-bits-label')[0].value;
+    }
+  }
+
+  function postUpdate(link, index) {
+    for (let i = Math.floor(link % 10) + 1; i < bitSets.length; i += 1) {
+      if (bitSets[i].name !== i) {
+        if (bitSets[i].link === link) {
+          bitSets[i].updateBits(index);
+        }
+        if (bitSets[i].otherLink === link) {
+          bitSets[i].updateOtherBits(index);
+        }
       }
     }
   }
