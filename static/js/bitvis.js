@@ -81,6 +81,19 @@
         this.otherLinkButton.disabled = true;
       }
 
+      let linkLabel = this.elem.getElementsByClassName('bits-label')[0];
+      linkLabel.addEventListener('input', function () {
+        postLabelUpdate(name * 10, linkLabel.value);
+      });
+      let otherLinkLabel = this.elem.getElementsByClassName('other-bits-label')[0];
+      otherLinkLabel.addEventListener('input', function () {
+        postLabelUpdate(name * 10 + 1, otherLinkLabel.value);
+      });
+      let resultLinkLabel = this.elem.getElementsByClassName('result-bits-label')[0];
+      resultLinkLabel.addEventListener('input', function () {
+        postLabelUpdate(name * 10 + 2, resultLinkLabel.value);
+      });
+
       this.refresh();
     }
 
@@ -251,41 +264,40 @@
   }
 
   function postUpdate(link, index) {
-    for (let i = Math.floor(link % 10) + 1; i < bitSets.length; i += 1) {
-      if (bitSets[i].name !== i) {
-        if (bitSets[i].link === link) {
-          bitSets[i].updateBits(index);
-        }
-        if (bitSets[i].otherLink === link) {
-          bitSets[i].updateOtherBits(index);
-        }
+    for (let i = Math.floor(link / 10) + 1; i < bitSets.length; i += 1) {
+      if (bitSets[i].link === link) {
+        bitSets[i].updateBits(index);
+      }
+      if (bitSets[i].otherLink === link) {
+        bitSets[i].updateOtherBits(index);
       }
     }
   }
 
-  function spawnBitSet() {
-    let name = bitSets.length;
+  function postLabelUpdate(link, label) {
+    for (let i = 0; i < bitSets.length; i += 1) {
+      if (bitSets[i].link === link) {
+        bitSets[i].elem.getElementsByClassName('link-button')[0].innerText = label;
+      }
+      if (bitSets[i].otherLink === link) {
+        bitSets[i].elem.getElementsByClassName('other-link-button')[0].innerText = label;
+      }
+    }
+  }
 
+  function addRow() {
     let elem = BIT_SET_PROTO.cloneNode(true);
     elem.removeAttribute('id');
     BIT_SETS_ELEM.appendChild(elem);
 
-    let bitSet = new BitSet(name, 8, elem);
-    bitSet.init();
-
+    let bitSet = new BitSet(bitSets.length, 8, elem);
     bitSets.push(bitSet);
-
-    bitSet.refresh();
-
-    return bitSet;
+    bitSet.init();
   }
 
 
   document.addEventListener('DOMContentLoaded', function () {
-    let first = spawnBitSet(null);
-
-    document.getElementById('add-row-btn').addEventListener('click', function () {
-      spawnBitSet();
-    });
+    addRow();
+    document.getElementById('add-row-btn').addEventListener('click', function () { addRow(); });
   });
 })();
