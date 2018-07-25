@@ -115,9 +115,18 @@
 
     setBit(index, value) {
       this.bits[index] = value;
-      this.buttons[index].innerText = value;
+      this.renderBit(index);
       postUpdate(this.name * 10, index);
       this.updateResultBits(index);
+    }
+
+    renderBit(index) {
+      this.buttons[index].innerText = this.bits[index];
+      if (this.bits[index]) {
+        this.buttons[index].classList.add('btn-on');
+      } else {
+        this.buttons[index].classList.remove('btn-on');
+      }
     }
 
     setOtherBit(index, value) {

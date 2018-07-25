@@ -1,3 +1,23 @@
 .nav-wrapper {
     background: #895400;
 }
+
+.btn {
+    background: #895400;
+}
+
+.btn:hover {
+    background: #afaf00;
+}
+
+.btn:focus {
+    background: #584300;
+}
+
+.btn-on {
+    background: #e0a000 !important;
+}
+
+.bit-row {
+    margin: 0;
+}
