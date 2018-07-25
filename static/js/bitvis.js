@@ -46,29 +46,29 @@
       let ops = this.elem.getElementsByClassName('bit-ops');
       for (let i = 0; i < ops.length; i += 1) {
         ops[i].name = 'bit-ops-' + this.name;
-        if (ops[i].classList.contains('invert-bit-op')) {
+        if (ops[i].classList.contains('not-bit-op')) {
           ops[i].addEventListener('change', function () {
-            if (ops[i].value) {
-              self.setOp(self.invert);
-            }
+            if (ops[i].value) { self.setOp(self.not); }
           });
         } else if (ops[i].classList.contains('shiftright-bit-op')) {
           ops[i].addEventListener('change', function () {
-            if (ops[i].value) {
-              self.setOp(self.shiftRight);
-            }
+            if (ops[i].value) { self.setOp(self.shiftRight); }
           });
         } else if (ops[i].classList.contains('shiftleft-bit-op')) {
           ops[i].addEventListener('change', function () {
-            if (ops[i].value) {
-              self.setOp(self.shiftLeft);
-            }
+            if (ops[i].value) { self.setOp(self.shiftLeft); }
+          });
+        } else if (ops[i].classList.contains('and-bit-op')) {
+          ops[i].addEventListener('change', function () {
+            if (ops[i].value) { self.setOp(self.and); }
+          });
+        } else if (ops[i].classList.contains('or-bit-op')) {
+          ops[i].addEventListener('change', function () {
+            if (ops[i].value) { self.setOp(self.or); }
           });
         } else if (ops[i].classList.contains('xor-bit-op')) {
           ops[i].addEventListener('change', function () {
-            if (ops[i].value) {
-              self.setOp(self.xor);
-            }
+            if (ops[i].value) { self.setOp(self.xor); }
           });
         }
       }
@@ -104,14 +104,13 @@
         this.buttons[i].innerText = this.bits[i];
         this.otherButtons[i].innerText = this.otherBits[i];
         this.buttons[i].disabled = this.link !== this.name * 10;
-        this.otherButtons[i].disabled = this.otherLink !== this.name * 10;
+        this.otherButtons[i].disabled = this.otherLink !== this.name * 10
+            || !(this.op === this.and  || this.op === this.or || this.op === this.xor);
       }
 
       this.linkButton.innerText = this.link === this.name * 10 ? 'INPUT' : linkName(this.link);
       this.otherLinkButton.innerText = this.otherLink === this.name * 10
           ? 'INPUT' : linkName(this.otherLink);
-
-      this.elem.getElementsByClassName('other-bits-div')[0].hidden = !(this.op === this.xor);
     }
 
     setBit(index, value) {
@@ -182,7 +181,7 @@
       this.setOtherBit(index, 1 - this.otherBits[index]);
     }
 
-    invert(index) {
+    not(index) {
       this.setResultBit(index, 1 - this.bits[index]);
     }
 
@@ -200,6 +199,14 @@
       } else {
         this.setResultBit(index - 1, this.bits[index]);
       }
+    }
+
+    and(index) {
+      this.setResultBit(index, this.bits[index] & this.otherBits[index]);
+    }
+
+    or(index) {
+      this.setResultBit(index, this.bits[index] | this.otherBits[index]);
     }
 
     xor(index) {
